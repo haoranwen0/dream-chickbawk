@@ -1,8 +1,0 @@
-.timer-container {
-  display: flex;
-}
-
-.timer-subcontainer {
-  display: flex;
-  flex-direction: column;
-}
