@@ -22,7 +22,13 @@ const CountdownTime = (props) => {
           variant='h1'
           color='chickbawk.light'
           fontWeight='bold'
-          fontSize='4.7rem'
+          fontSize={{
+            xl: '6rem',
+            lg: '4.5rem',
+            md: '4rem',
+            sm: '3.5rem',
+            xs: '2.75rem'
+          }}
         >
           {props.countdownTime}
         </Typography>

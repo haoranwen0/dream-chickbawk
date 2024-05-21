@@ -1,5 +1,8 @@
 {
   "rules": {
+    "rsvp-forms": {
+      ".indexOn": ["email"]
+    },
     ".read": true,
     ".write": true
   }

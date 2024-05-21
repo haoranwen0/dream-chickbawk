@@ -1,5 +1,5 @@
 export const calculateTimeLeft = () => {
-  const difference = +new Date('2024-05-24T12:00:00-04:00') - +new Date()
+  const difference = +new Date('2024-05-26T12:00:00-04:00') - +new Date()
   let timeLeft = {}
 
   const addLeadingZero = (num) => (num < 10 ? `0${num}` : num.toString())

@@ -2,7 +2,16 @@ import * as React from 'react'
 
 // prettier-ignore
 import { Stack, TextField, Button, CircularProgress } from '@mui/material'
-import { getDatabase, ref, push } from 'firebase/database'
+import {
+  getDatabase,
+  ref,
+  push,
+  query,
+  orderByChild,
+  equalTo,
+  get
+} from 'firebase/database'
+import * as EmailValidator from 'email-validator'
 
 const customTextfieldStyles = {
   '& .MuiFilledInput-root': {
@@ -29,10 +38,12 @@ const customTextfieldStyles = {
 const RSVPForm = (props) => {
   const [form, setForm] = React.useState({
     name: '',
+    email: '',
     dietaryRestrictions: ''
   })
   const [errors, setErrors] = React.useState({
-    name: ''
+    name: '',
+    email: ''
   })
   const [loading, setLoading] = React.useState(false)
 
@@ -42,14 +53,46 @@ const RSVPForm = (props) => {
     e.preventDefault()
     const { name, value } = e.target
     setForm((prevState) => ({ ...prevState, [name]: value }))
+    setErrors({ name: '', email: '' })
   }
 
-  const writeRSVPData = () => {
+  const validNewEmail = async () => {
     const db = getDatabase()
-    push(ref(db, 'rsvp-forms'), {
-      name: form.name,
-      dietary_restrictions: form.dietaryRestrictions
-    })
+    try {
+      const emailQuery = query(
+        ref(db, 'rsvp-forms'),
+        orderByChild('email'),
+        equalTo(form.email)
+      )
+      const emailSnapshot = await get(emailQuery)
+
+      if (emailSnapshot.exists()) {
+        props.setState('already-rsvped')
+      }
+
+      return !emailSnapshot.exists()
+    } catch (error) {
+      console.log('Error checking if email exists:', error)
+      setLoading(false)
+      throw error
+    }
+  }
+
+  const writeRSVPData = async () => {
+    const db = getDatabase()
+
+    try {
+      await push(ref(db, 'rsvp-forms'), {
+        name: form.name,
+        email: form.email,
+        dietary_restrictions: form.dietaryRestrictions
+      })
+      console.log('RSVP entry added successfully.')
+    } catch (error) {
+      console.log('Error writing RSVP data:', error)
+      setLoading(false)
+      throw error
+    }
   }
 
   const clearForm = () => {
@@ -60,26 +103,37 @@ const RSVPForm = (props) => {
   }
 
   const validateForm = () => {
+    let valid = true
     if (form.name.trim() === '') {
       setErrors((prevState) => ({
         ...prevState,
         name: 'WHO ARE YOU???'
       }))
-      return false
+      valid = false
     }
-    return true
+
+    if (!EmailValidator.validate(form.email)) {
+      setErrors((prevState) => ({
+        ...prevState,
+        email: 'INVALID EMAIL!!!'
+      }))
+      valid = false
+    }
+
+    return valid
   }
 
   const onSubmit = async () => {
-    console.log('Submitting form')
-    if (validateForm()) {
-      setLoading((prevState) => !prevState)
-      await delay(500)
+    setLoading((prevState) => !prevState)
+
+    if (validateForm() && (await validNewEmail())) {
       writeRSVPData()
-      setLoading((prevState) => !prevState)
-      props.setRsvped(true)
-      clearForm()
+      props.setState('rsvped')
     }
+
+    clearForm()
+
+    setLoading((prevState) => !prevState)
   }
 
   const handleKeyDown = (e) => {
@@ -100,6 +154,18 @@ const RSVPForm = (props) => {
         helperText={errors.name}
         fullWidth
         value={form.name}
+        onChange={onChange}
+        sx={customTextfieldStyles}
+      />
+      <TextField
+        autoComplete='off'
+        variant='filled'
+        label='Email'
+        name='email'
+        error={!!errors.email}
+        helperText={errors.email}
+        fullWidth
+        value={form.email}
         onChange={onChange}
         sx={customTextfieldStyles}
       />
