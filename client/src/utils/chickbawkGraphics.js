@@ -1,6 +1,7 @@
 import ChickbawkInfo from '../assets/chickbawk-info.svg'
 import ChickbawkBeer from '../assets/chickbawk-beer.svg'
 import ChickbawkChicken from '../assets/chickbawk-chicken.svg'
+import ChickbawkFrom from '../assets/chickbawk-from.svg'
 import Chickbawk from '../assets/chickbawk-graphic.svg'
 import ChickbawkMessageThanks from '../assets/chickbawk-message-thanks.svg'
 import ChickbawkMessageAlreadyRSVPed from '../assets/chickbawk-message-already-rsvped.svg'
@@ -8,10 +9,13 @@ import ChickbawkMessageAlreadyRSVPed from '../assets/chickbawk-message-already-r
 const chickbawkGraphics = (messageState) => {
   const initialChickbawkGraphics = [
     {
+      name: 'chickbawk',
       src: Chickbawk,
-      width: '100%'
+      width: '100%',
+      sx: { cursor: 'pointer' }
     },
     {
+      name: 'info',
       src: ChickbawkInfo,
       position: 'absolute',
       bottom: '-15%',
@@ -20,6 +24,7 @@ const chickbawkGraphics = (messageState) => {
       width: '50%'
     },
     {
+      name: 'beer',
       src: ChickbawkBeer,
       position: 'absolute',
       bottom: '0%',
@@ -28,16 +33,27 @@ const chickbawkGraphics = (messageState) => {
       width: '25%'
     },
     {
+      name: 'chicken',
       src: ChickbawkChicken,
       position: 'absolute',
       top: '8%',
       left: '4%',
       sx: { transform: 'rotate(46deg)' },
       width: '25%'
+    },
+    {
+      name: 'from',
+      src: ChickbawkFrom,
+      position: 'absolute',
+      top: '36%',
+      left: '-3.5%',
+      sx: { transform: 'rotate(90deg)' },
+      width: '35%'
     }
   ]
 
   const chickbawkMessage = {
+    name: 'message',
     position: 'absolute',
     top: '5%',
     left: '52.5%',

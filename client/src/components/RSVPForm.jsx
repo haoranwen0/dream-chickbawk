@@ -2,16 +2,10 @@ import * as React from 'react'
 
 // prettier-ignore
 import { Stack, TextField, Button, CircularProgress } from '@mui/material'
-import {
-  getDatabase,
-  ref,
-  push,
-  query,
-  orderByChild,
-  equalTo,
-  get
-} from 'firebase/database'
+// prettier-ignore
+import { getDatabase, ref, push, query, orderByChild, equalTo, get, runTransaction } from 'firebase/database'
 import * as EmailValidator from 'email-validator'
+import { useSearchParams } from 'react-router-dom'
 
 const customTextfieldStyles = {
   '& .MuiFilledInput-root': {
@@ -36,18 +30,18 @@ const customTextfieldStyles = {
 }
 
 const RSVPForm = (props) => {
+  let [searchParams, setSearchParams] = useSearchParams()
+
   const [form, setForm] = React.useState({
     name: '',
     email: '',
-    dietaryRestrictions: ''
+    notes: ''
   })
   const [errors, setErrors] = React.useState({
     name: '',
     email: ''
   })
   const [loading, setLoading] = React.useState(false)
-
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
   const onChange = (e) => {
     e.preventDefault()
@@ -56,21 +50,23 @@ const RSVPForm = (props) => {
     setErrors({ name: '', email: '' })
   }
 
-  const validNewEmail = async () => {
+  const validEmail = async (email, type = 'not-exists') => {
     const db = getDatabase()
     try {
       const emailQuery = query(
         ref(db, 'rsvp-forms'),
         orderByChild('email'),
-        equalTo(form.email)
+        equalTo(email)
       )
       const emailSnapshot = await get(emailQuery)
 
-      if (emailSnapshot.exists()) {
+      if (type === 'not-exists' && emailSnapshot.exists()) {
         props.setState('already-rsvped')
       }
 
-      return !emailSnapshot.exists()
+      return type === 'exists'
+        ? emailSnapshot.exists()
+        : !emailSnapshot.exists()
     } catch (error) {
       console.log('Error checking if email exists:', error)
       setLoading(false)
@@ -78,15 +74,66 @@ const RSVPForm = (props) => {
     }
   }
 
-  const writeRSVPData = async () => {
+  const updateReferrerRSVPData = async (formId) => {
+    const db = getDatabase()
+
+    try {
+      await runTransaction(
+        ref(db, `rsvp-forms/${formId}/referral_count`),
+        (currentCount) => {
+          return (currentCount || 0) + 1
+        }
+      )
+    } catch (error) {
+      console.log("Error updating referrer's RSVP data:", error)
+
+      throw error
+    }
+  }
+
+  const getFormIdByEmail = async (email) => {
+    const db = getDatabase()
+
+    try {
+      const emailQuery = query(
+        ref(db, 'rsvp-forms'),
+        orderByChild('email'),
+        equalTo(email)
+      )
+      const snapshot = await get(emailQuery)
+
+      if (snapshot.exists()) {
+        // Iterate through the results to get the formId
+        const data = snapshot.val()
+        const formIds = Object.keys(data)
+
+        if (formIds.length === 1) {
+          return formIds[0] // Return the formId if there is exactly one matching entry
+        } else {
+          throw new Error(`Multiple or no entries found for email: ${email}`)
+        }
+      } else {
+        throw new Error(`No entry found for email: ${email}`)
+      }
+    } catch (error) {
+      console.log('Error getting referrer form id:', error)
+
+      throw error
+    }
+  }
+
+  const writeRSVPData = async (referrerEmail) => {
     const db = getDatabase()
 
     try {
       await push(ref(db, 'rsvp-forms'), {
-        name: form.name,
-        email: form.email,
-        dietary_restrictions: form.dietaryRestrictions
+        name: form.name.trim(),
+        email: form.email.trim(),
+        notes: form.notes,
+        ...(referrerEmail !== null && { referrer: referrerEmail })
       })
+
+      props.setUserId(form.email)
       console.log('RSVP entry added successfully.')
     } catch (error) {
       console.log('Error writing RSVP data:', error)
@@ -98,7 +145,7 @@ const RSVPForm = (props) => {
   const clearForm = () => {
     setForm({
       name: '',
-      dietaryRestrictions: ''
+      notes: ''
     })
   }
 
@@ -126,12 +173,29 @@ const RSVPForm = (props) => {
   const onSubmit = async () => {
     setLoading((prevState) => !prevState)
 
-    if (validateForm() && (await validNewEmail())) {
-      writeRSVPData()
-      props.setState('rsvped')
-    }
+    try {
+      const referrerEmail = searchParams.get('referrer')
 
-    clearForm()
+      const validReferrer =
+        referrerEmail !== null && (await validEmail(referrerEmail, 'exists'))
+      const validForm = validateForm() && (await validEmail(form.email))
+
+      if (validForm) {
+        if (validReferrer) {
+          await writeRSVPData(referrerEmail)
+          await updateReferrerRSVPData(await getFormIdByEmail(referrerEmail))
+        } else {
+          await writeRSVPData(null)
+        }
+        props.setState('rsvped')
+      }
+
+      clearForm()
+    } catch (error) {
+      console.log('Error submitting form:', error)
+
+      throw error
+    }
 
     setLoading((prevState) => !prevState)
   }
@@ -172,10 +236,11 @@ const RSVPForm = (props) => {
       <TextField
         autoComplete='off'
         variant='filled'
-        label='Dietary Restrictions'
-        name='dietaryRestrictions'
+        label='Notes'
+        placeholder='Dietary restrictions, favorite bbq chicken/beer flavor, ...'
+        name='notes'
         fullWidth
-        value={form.dietaryRestrictions}
+        value={form.notes}
         onChange={onChange}
         sx={customTextfieldStyles}
       />

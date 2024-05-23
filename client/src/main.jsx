@@ -8,6 +8,7 @@ import app from './firebaseConfig.js'
 import theme from './theme.js'
 
 import './main.css'
+// import './scrollbar.css'
 
 initializeApp(app)
 
