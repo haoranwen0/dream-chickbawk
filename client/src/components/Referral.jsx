@@ -1,9 +1,9 @@
 import * as React from 'react'
 
-import { Typography, Stack, Dialog, DialogTitle, Divider } from '@mui/material'
+import { Typography, Stack } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import CheckIcon from '@mui/icons-material/Check'
-import theme from '../theme'
+import CustomDialog from './CustomDialog'
 
 const Referral = (props) => {
   const referralLinkRef = React.useRef(null)
@@ -34,109 +34,70 @@ const Referral = (props) => {
     }, 1500)
   }
 
-  const handleClose = () => {
-    setDialogOpen(false)
-  }
-
   return (
-    <Dialog
-      onClose={handleClose}
+    <CustomDialog
+      onClose={() => setDialogOpen(false)}
       open={dialogOpen}
-      sx={{
-        '& .MuiDialog-paper': {
-          border: '1px solid #000000',
-          borderRadius: '0.5rem', // Customize the border radius here
-          width: { xl: '40%', lg: '55%', md: '70%', sm: '85%', xs: '80%' }
-        }
-      }}
+      dialogTitle='Referral Program!'
     >
+      <Typography color='chickbawk.accent'>
+        Refer people to get{' '}
+        <Typography fontWeight='800' as='span'>
+          10% off
+        </Typography>{' '}
+        because the event is not free because Hao is broke. BUTTT refer enough
+        and you'll get a free meal!
+      </Typography>
       <Stack
         p='1rem'
-        spacing={2}
-        bgcolor='chickbawk.light'
         width='100%'
-        sx={{
-          background: `linear-gradient(to bottom, ${theme.palette.chickbawk.secondary}, ${theme.palette.chickbawk.primary})`
-        }}
+        borderRadius='0.25rem'
+        bgcolor='chickbawk.light'
+        border='1px solid'
+        borderColor='#dddddd'
+        position='relative'
+        pr='3rem'
+        onClick={copyToClipboard}
+        sx={{ cursor: 'pointer' }}
       >
-        <DialogTitle
+        <Typography
+          as='span'
+          variant='body1'
           color='chickbawk.accent'
-          fontWeight='900'
-          fontSize={{
-            xl: '3rem',
-            lg: '2.75rem',
-            md: '2.5rem',
-            sm: '2.25rem',
-            xs: '2rem'
-          }}
-          sx={{
-            '&.MuiDialogTitle-root': {
-              padding: '0rem'
-            }
-          }}
+          ref={referralLinkRef}
+          tabIndex={0}
+          fontStyle='italic'
         >
-          Referral Program!
-        </DialogTitle>
-        <Divider />
-        <Typography color='chickbawk.accent'>
-          Refer people to get{' '}
-          <Typography fontWeight='800' as='span'>
-            10% off
-          </Typography>{' '}
-          because the event is not free because Hao is broke. BUTTT refer enough
-          and you'll get a free meal!
+          {referralLink}
         </Typography>
         <Stack
-          p='0.5rem'
-          width='100%'
-          borderRadius='0.25rem'
-          bgcolor='chickbawk.light'
-          border='1px solid'
-          borderColor='#dddddd'
-          position='relative'
-          pr='2rem'
-          onClick={copyToClipboard}
-          sx={{ cursor: 'pointer' }}
+          justifyContent='center'
+          alignItems='center'
+          position='absolute'
+          right='1rem'
+          top='50%'
+          sx={{ transform: 'translate(0, -50%)' }}
         >
-          <Typography
-            as='span'
-            variant='body1'
-            color='chickbawk.accent'
-            ref={referralLinkRef}
-            tabIndex={0}
-            fontStyle='italic'
-          >
-            {referralLink}
-          </Typography>
-          <Stack
-            justifyContent='center'
-            alignItems='center'
-            position='absolute'
-            right='0.5rem'
-            top='50%'
-            sx={{ transform: 'translate(0, -50%)' }}
-          >
-            {copiedReferralLink ? (
-              <CheckIcon
-                sx={{
-                  cursor: 'pointer',
-                  color: 'chickbawk.accent',
-                  fontSize: '1.25rem'
-                }}
-              />
-            ) : (
-              <ContentCopyIcon
-                sx={{
-                  cursor: 'pointer',
-                  color: 'chickbawk.accent',
-                  fontSize: '1.25rem'
-                }}
-              />
-            )}
-          </Stack>
+          {copiedReferralLink ? (
+            <CheckIcon
+              sx={{
+                cursor: 'pointer',
+                color: 'chickbawk.accent',
+                fontSize: '1.25rem'
+              }}
+            />
+          ) : (
+            <ContentCopyIcon
+              sx={{
+                cursor: 'pointer',
+                color: 'chickbawk.accent',
+                fontSize: '1.25rem'
+              }}
+            />
+          )}
         </Stack>
       </Stack>
-    </Dialog>
+    </CustomDialog>
   )
 }
 

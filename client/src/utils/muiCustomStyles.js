@@ -8,3 +8,11 @@ export const buttonStyle = {
   fontWeight: '900',
   boxShadow: '0px 0px 20px #FA971270'
 }
+
+export const responsiveContainerWidth = {
+  xl: '40%',
+  lg: '55%',
+  md: '70%',
+  sm: '85%',
+  xs: '100%'
+}

@@ -5,9 +5,13 @@ import ChickbawkGraphics from './ChickbawkGraphics'
 import Attendees from './Attendees'
 import Main from './Main'
 import Referral from './Referral'
+import Alerts from './Alerts'
+import CustomDialog from './CustomDialog'
 
 export {
   Main,
+  Alerts,
+  CustomDialog,
   CustomDivider,
   CountdownTime,
   RSVPForm,

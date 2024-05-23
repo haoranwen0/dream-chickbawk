@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { getDatabase, ref, get } from 'firebase/database'
 // prettier-ignore
-import { Stack, Typography, Tooltip, Box, Dialog, DialogTitle, Divider } from '@mui/material'
+import { Stack, Typography, Tooltip, Box } from '@mui/material'
 import { getInitials } from '../utils/utils'
-import theme from '../theme'
+import CustomDialog from './CustomDialog'
 
 const Attendees = () => {
   const [attendees, setAttendees] = React.useState([])
@@ -107,70 +107,40 @@ const Attendees = () => {
           </Box>
         )}
       </Stack>
-      <Dialog
+      <CustomDialog
         onClose={() => setShowAttendeesDialog(false)}
         open={showAttendeesDialog}
-        sx={{
-          '& .MuiDialog-paper': {
-            border: '1px solid #000000',
-            borderRadius: '0.5rem', // Customize the border radius here
-            width: { xl: '40%', lg: '55%', md: '70%', sm: '85%', xs: '80%' },
-            maxHeight: '400px'
-          }
-        }}
+        maxHeight='400px'
+        dialogTitle='Attendees'
       >
-        <Stack
-          p='1rem'
-          spacing={2}
-          bgcolor='chickbawk.secondary'
-          width='100%'
-          sx={{
-            background: `linear-gradient(to bottom, ${theme.palette.chickbawk.secondary}, ${theme.palette.chickbawk.primary})`
-          }}
-        >
-          <DialogTitle
-            color='chickbawk.accent'
-            fontWeight='900'
-            fontSize={{
-              xl: '3rem',
-              lg: '2.75rem',
-              md: '2.5rem',
-              sm: '2.25rem',
-              xs: '2rem'
-            }}
-            sx={{
-              '&.MuiDialogTitle-root': {
-                padding: '0rem'
-              }
-            }}
-          >
-            Attendees
-          </DialogTitle>
-          <Divider />
-          <Stack flexDirection='row' flexWrap='wrap' gap={1}>
-            {attendees.map((attendee, index) => {
-              return (
-                <Box width={{ xs: 'calc((100% - 0.5rem) / 2)' }} key={index}>
-                  <Typography
-                    color='chickbawk.accent'
-                    p='0.5rem'
-                    borderRadius='0.75rem'
-                    // border='1px solid'
-                    // borderColor='#dddddd'
-                    bgcolor='chickbawk.light'
-                    textAlign='center'
-                    fontWeight='600'
-                    textTransform='uppercase'
-                    fontSize='0.875rem'
-                  >
-                    {attendee}
-                  </Typography>
-                </Box>
-              )
-            })}
-          </Stack>
+        <Stack flexDirection='row' flexWrap='wrap' gap={1}>
+          {attendees.map((attendee, index) => {
+            return (
+              <Box
+                width={{
+                  xs: 'calc((100% - 0.5rem) / 2)',
+                  md: 'calc((100% - (2 * 0.5rem)) / 3)'
+                }}
+                key={index}
+              >
+                <Typography
+                  noWrap
+                  color='chickbawk.accent'
+                  p='1rem'
+                  borderRadius='0.75rem'
+                  bgcolor='chickbawk.light'
+                  textAlign='center'
+                  fontWeight='600'
+                  textTransform='uppercase'
+                  fontSize='0.875rem'
+                >
+                  {attendee}
+                </Typography>
+              </Box>
+            )
+          })}
         </Stack>
-      </Dialog>
+      </CustomDialog>
     </Box>
   )
 }

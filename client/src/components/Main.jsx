@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { calculateTimeLeft } from '../utils/utils'
 import { Button, Stack, Alert } from '@mui/material'
+import { Helmet } from 'react-helmet'
 // prettier-ignore
-import { CountdownTime, RSVPForm, ChickbawkGraphics, Attendees, Referral } from '../components'
-import { buttonStyle } from '../utils/muiCustomStyles'
+import { CountdownTime, RSVPForm, ChickbawkGraphics, Attendees, Referral, Alerts } from '../components'
+import { buttonStyle, responsiveContainerWidth } from '../utils/muiCustomStyles'
 import theme from '../theme'
 
 function Main() {
@@ -31,16 +32,16 @@ function Main() {
       }}
       gap={4}
     >
-      <Alert variant='filled' severity='warning' sx={{ width: '100%' }}>
-        RSVP By Friday 5/24 11:59 PM! Text 347-543-6365 for any issues!
-      </Alert>
-      <Stack
-        alignItems='center'
-        spacing={2}
-        sx={{
-          width: { xl: '40%', lg: '55%', md: '70%', sm: '85%', xs: '100%' }
-        }}
-      >
+      <Helmet>
+        <title>Hao's Dream Chickbawk!</title>
+        <link
+          rel='icon'
+          type='image/svg+xml'
+          href='../assets/icon/chickbawk-favicon.svg'
+        />
+      </Helmet>
+      <Alerts />
+      <Stack alignItems='center' spacing={2} width={responsiveContainerWidth}>
         <Stack
           direction='row'
           spacing={2}
