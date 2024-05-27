@@ -2,6 +2,7 @@ import ChickbawkInfo from '../assets/chickbawk-info.svg'
 import ChickbawkBeer from '../assets/chickbawk-beer.svg'
 import ChickbawkChicken from '../assets/chickbawk-chicken.svg'
 import ChickbawkFrom from '../assets/chickbawk-from.svg'
+import ChickbawkWhat from '../assets/chickbawk-what.svg'
 import Chickbawk from '../assets/chickbawk-graphic.svg'
 import ChickbawkMessageThanks from '../assets/chickbawk-message-thanks.svg'
 import ChickbawkMessageAlreadyRSVPed from '../assets/chickbawk-message-already-rsvped.svg'
@@ -22,6 +23,15 @@ const chickbawkGraphics = (messageState) => {
       right: '50%',
       sx: { transform: 'translate(50%, 0)' },
       width: '50%'
+    },
+    {
+      name: 'what',
+      src: ChickbawkWhat,
+      position: 'absolute',
+      top: '-15%',
+      left: '50%',
+      sx: { transform: 'translate(-50%, 0)' },
+      width: '45%'
     },
     {
       name: 'beer',
